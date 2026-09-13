@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Leitor de Endereços — NB Express</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f5f7;color:#17212b}
+header{background:#0b2545;color:white;padding:18px 16px;font-size:20px;font-weight:700}
+main{max-width:760px;margin:auto;padding:14px}
+.card{background:white;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 2px 10px #0001}
+video{width:100%;border-radius:12px;background:#111;max-height:52vh;object-fit:cover}
+button{border:0;border-radius:10px;padding:13px 15px;font-size:16px;font-weight:700;cursor:pointer;margin:5px 3px}
+.primary{background:#0b2545;color:white}.secondary{background:#e9eef3;color:#17212b}.danger{background:#b42318;color:white}
+label{display:block;font-weight:700;margin-top:9px;font-size:13px}
+input{width:100%;padding:11px;border:1px solid #ccd4dc;border-radius:8px;font-size:16px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:8px}.status{font-size:14px;color:#4a5560;margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #e2e7eb;text-align:left;vertical-align:top}th{background:#f1f4f6}
+.small{font-size:12px;color:#59636e}.row{display:flex;flex-wrap:wrap;gap:5px}
+</style>
+</head>
+<body>
+<header>📦 NB Express — Leitor de Endereços</header>
+<main>
+<div class="card">
+  <video id="video" autoplay playsinline></video>
+  <div class="row">
+    <button class="primary" id="start">📷 Iniciar câmera</button>
+    <button class="secondary" id="read">🔎 Ler endereço</button>
+  </div>
+  <div class="status" id="status">Aponte para a área do DESTINATÁRIO da etiqueta e toque em “Ler endereço”.</div>
+  <canvas id="canvas" hidden></canvas>
+</div>
+
+<div class="card">
+  <b>Resultado da leitura</b>
+  <div class="grid">
+    <div><label>Endereço</label><input id="endereco"></div>
+    <div><label>Número</label><input id="numero"></div>
+  </div>
+  <label>Complemento</label><input id="complemento">
+  <label>Bairro</label><input id="bairro">
+  <div class="grid">
+    <div><label>Cidade</label><input id="cidade"></div>
+    <div><label>UF</label><input id="uf"></div>
+  </div>
+  <label>CEP</label><input id="cep">
+  <div class="row">
+    <button class="primary" id="add">➕ Adicionar à lista</button>
+    <button class="secondary" id="clear">Limpar</button>
+  </div>
+  <div class="small">O OCR pode precisar de conferência. Corrija qualquer campo antes de adicionar.</div>
+</div>
+
+<div class="card">
+  <div class="row" style="justify-content:space-between;align-items:center">
+    <b>Entregas: <span id="count">0</span></b>
+    <button class="primary" id="export">📊 Exportar Excel</button>
+  </div>
+  <div style="overflow:auto;margin-top:10px">
+    <table><thead><tr><th>Endereço</th><th>Nº</th><th>Compl.</th><th>Bairro</th><th>Cidade</th><th>UF</th><th>CEP</th></tr></thead>
+    <tbody id="tbody"></tbody></table>
+  </div>
+</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let rows=[];
+async function startCamera(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
+    $("video").srcObject=stream;
+    $("status").textContent="Câmera ativa. Enquadre o endereço do destinatário.";
+  }catch(e){$("status").textContent="Não foi possível acessar a câmera. Autorize a câmera no navegador.";console.error(e)}
+}
+function clearFields(){["endereco","numero","complemento","bairro","cidade","uf","cep"].forEach(x=>$(x).value="")}
+function parseAddress(text){
+  text=text.replace(/\s+/g," ").trim();
+  const out={endereco:"",numero:"",complemento:"",bairro:"",cidade:"",uf:"RS",cep:""};
+  const cep=(text.match(/\b\d{5}[-\s]?\d{3}\b/)||[])[0];
+  if(cep) out.cep=cep.replace(/\s/g,"-");
+  // Remove common noise after/before destination area
+  let s=text.replace(/\bCEP\b[:\s]*/ig,"").replace(/\b\d{5}[-\s]?\d{3}\b/g,"");
+  s=s.replace(/\bRio Grande do Sul\b/ig,"");
+  // Try to find city followed by UF/state or CEP
+  const cityM=s.match(/,\s*([A-Za-zÀ-ÿ' -]+?)\s*,?\s*(?:RS|Rio Grande)/i);
+  if(cityM) out.cidade=cityM[1].trim();
+  else {
+    const m=s.match(/,\s*(Sapucaia do Sul)\b/i);
+    if(m) out.cidade=m[1];
+  }
+  // Complement
+  const comp=s.match(/\b(AP(?:TO)?\.?\s*\d+|CASA(?:\s+\d+)?|FUNDOS|SALA\s*\d+|BL(?:OCO)?\.?\s*[A-Z0-9]+)\b/i);
+  if(comp) out.complemento=comp[1];
+  // Street + number
+  const street=s.match(/(?:Casa,\s*)?(?:Fortuna\s+)?((?:Rua|R\.|Avenida|Av\.|Travessa|Tv\.|Estrada|Rodovia|Alameda|Praça)\s+.+?)\s+(\d+[A-Za-z]?)\b/i);
+  if(street){out.endereco=street[1].trim();out.numero=street[2]}
+  else {
+    const alt=s.match(/((?:Rua|R\.|Avenida|Av\.|Travessa|Tv\.|Estrada|Rodovia|Alameda|Praça)\s+.+?)\s+(\d+[A-Za-z]?)\b/i);
+    if(alt){out.endereco=alt[1].trim();out.numero=alt[2]}
+  }
+  // Bairro: often appears as "casa, Fortuna Rua ..." in these labels
+  const b=s.match(/\b(?:casa,\s*)?([A-Za-zÀ-ÿ' -]+?)\s+(?:Rua|Avenida|Av\.|Travessa)\b/i);
+  if(b && /fortuna/i.test(b[1])) out.bairro="Fortuna";
+  // Fallback: use text around city if street not detected
+  if(!out.cidade){
+    const m=s.match(/,\s*([A-Za-zÀ-ÿ' -]+?)\s*,\s*(?:Rio Grande|RS)/i);
+    if(m) out.cidade=m[1].trim();
+  }
+  return out;
+}
+async function readOCR(){
+  const video=$("video"), canvas=$("canvas");
+  if(!video.srcObject){await startCamera(); if(!video.srcObject)return}
+  canvas.width=video.videoWidth||1280; canvas.height=video.videoHeight||720;
+  const ctx=canvas.getContext("2d"); ctx.drawImage(video,0,0,canvas.width,canvas.height);
+  $("status").textContent="Lendo a etiqueta… isso pode levar alguns segundos.";
+  try{
+    const result=await Tesseract.recognize(canvas,"por",{logger:m=>{
+      if(m.status==="recognizing text") $("status").textContent="Lendo… "+Math.round((m.progress||0)*100)+"%";
+    }});
+    const text=result.data.text;
+    const p=parseAddress(text);
+    $("endereco").value=p.endereco;$("numero").value=p.numero;$("complemento").value=p.complemento;
+    $("bairro").value=p.bairro;$("cidade").value=p.cidade;$("uf").value=p.uf;$("cep").value=p.cep;
+    $("status").textContent="Leitura concluída. Confira os campos e toque em “Adicionar à lista”.";
+  }catch(e){$("status").textContent="Não consegui ler a etiqueta. Tente aproximar, melhorar a iluminação e enquadrar somente o endereço.";console.error(e)}
+}
+function addRow(){
+  const r={Endereço:$("endereco").value.trim(),Número:$("numero").value.trim(),Complemento:$("complemento").value.trim(),
+           Bairro:$("bairro").value.trim(),Cidade:$("cidade").value.trim(),UF:$("uf").value.trim(),CEP:$("cep").value.trim()};
+  if(!r.Endereço && !r.Cidade){alert("Leia o endereço ou preencha os campos antes de adicionar.");return}
+  rows.push(r); render(); clearFields();
+  $("status").textContent="Entrega adicionada. Aponte para o próximo pacote.";
+}
+function render(){
+  $("count").textContent=rows.length;
+  $("tbody").innerHTML=rows.map(r=>`<tr>${["Endereço","Número","Complemento","Bairro","Cidade","UF","CEP"].map(k=>`<td>${(r[k]||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]))}</td>`).join("")}</tr>`).join("");
+}
+function exportExcel(){
+  if(!rows.length){alert("Ainda não há entregas na lista.");return}
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Entregas");
+  XLSX.writeFile(wb,"NB_Express_Entregas.xlsx");
+}
+$("start").onclick=startCamera;$("read").onclick=readOCR;$("add").onclick=addRow;$("clear").onclick=clearFields;$("export").onclick=exportExcel;
+</script>
+</body></html>
