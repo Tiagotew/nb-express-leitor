@@ -2,1220 +2,787 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>NB Express - Leitor de Endereços</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NB Express - Leitor iMile</title>
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#eef2f5;
-  color:#17212b;
-}
-
-header{
-  background:#0b2545;
-  color:#fff;
-  padding:18px 16px;
-  font-size:21px;
-  font-weight:bold;
-  text-align:center;
-}
-
-main{
-  max-width:760px;
-  margin:auto;
-  padding:14px;
-}
-
-.card{
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 3px 12px rgba(0,0,0,.08);
-}
-
-h2{
-  margin:0 0 12px;
-  font-size:18px;
-}
-
-p{
-  line-height:1.45;
-}
-
-.camera{
-  position:relative;
-  background:#111;
-  border-radius:14px;
-  overflow:hidden;
-  min-height:300px;
-}
-
-video{
-  width:100%;
-  display:block;
-  background:#111;
-}
-
-.overlay{
-  position:absolute;
-  left:8%;
-  top:27%;
-  width:76%;
-  height:46%;
-  border:3px solid #fff;
-  border-radius:10px;
-  box-shadow:0 0 0 9999px rgba(0,0,0,.42);
-  pointer-events:none;
-}
-
-.overlay span{
-  position:absolute;
-  top:-34px;
-  left:0;
-  background:#fff;
-  color:#111;
-  padding:6px 9px;
-  border-radius:6px;
-  font-size:13px;
-  font-weight:bold;
-}
-
-.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:12px;
-}
-
-button{
-  border:0;
-  border-radius:10px;
-  padding:14px 10px;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.primary{
-  background:#0b2545;
-  color:white;
-}
-
-.green{
-  background:#16834b;
-  color:white;
-}
-
-.gray{
-  background:#e4e8ec;
-  color:#17212b;
-}
-
-.red{
-  background:#c62828;
-  color:white;
-}
-
-button:disabled{
-  opacity:.45;
-}
-
-input[type=file]{
-  width:100%;
-  padding:10px;
-  background:#f4f6f8;
-  border-radius:8px;
-}
-
-.status{
-  margin-top:12px;
-  padding:10px;
-  border-radius:9px;
-  background:#f0f3f5;
-  font-size:14px;
-}
-
-.result{
-  display:grid;
-  gap:10px;
-}
-
-label{
-  font-weight:bold;
-  font-size:14px;
-}
-
-input[type=text]{
-  width:100%;
-  padding:12px;
-  border:1px solid #cbd3da;
-  border-radius:9px;
-  font-size:16px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:14px;
-}
-
-th,td{
-  border-bottom:1px solid #ddd;
-  padding:9px 6px;
-  text-align:left;
-}
-
-th{
-  background:#f1f4f6;
-}
-
-.table-wrap{
-  overflow-x:auto;
-}
-
-.small{
-  font-size:13px;
-  color:#59636d;
-}
-
-#preview{
-  max-width:100%;
-  display:none;
-  margin-top:10px;
-  border-radius:10px;
-}
-
-.loading{
-  display:none;
-  text-align:center;
-  padding:15px;
-  font-weight:bold;
-}
-
-@media(max-width:500px){
-  .buttons{
-    grid-template-columns:1fr;
-  }
-
-  header{
-    font-size:19px;
-  }
-}
+body{margin:0;background:#eef2f5;font-family:Arial,sans-serif;color:#17212b}
+header{background:#0b2545;color:white;text-align:center;padding:18px;font-size:21px;font-weight:bold}
+main{max-width:760px;margin:auto;padding:14px}
+.card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 3px 12px #0001}
+h2{margin:0 0 12px;font-size:19px}
+.small{font-size:13px;color:#59636d;line-height:1.4}
+.camera{position:relative;background:#111;border-radius:14px;overflow:hidden}
+video{width:100%;display:block}
+.guide{position:absolute;left:6%;top:25%;width:68%;height:50%;border:3px solid white;border-radius:10px;box-shadow:0 0 0 9999px #0007;pointer-events:none}
+.guide span{position:absolute;top:-34px;left:0;background:white;color:#111;padding:6px;border-radius:5px;font-size:12px;font-weight:bold}
+button{border:0;border-radius:10px;padding:14px;font-size:16px;font-weight:bold;cursor:pointer}
+.primary{background:#0b2545;color:white}
+.green{background:#16834b;color:white}
+.gray{background:#e3e7eb;color:#17212b}
+.red{background:#c62828;color:white}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+button:disabled{opacity:.45}
+.status{margin-top:12px;padding:10px;background:#f1f4f6;border-radius:8px;font-size:14px}
+.loading{display:none;padding:14px;text-align:center;font-weight:bold}
+.field{margin-bottom:10px}
+label{display:block;font-weight:bold;margin-bottom:5px}
+input[type=text]{width:100%;padding:12px;border:1px solid #ccd3d9;border-radius:9px;font-size:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 6px;border-bottom:1px solid #ddd;text-align:left}
+th{background:#f0f3f5}
+.wrap{overflow-x:auto}
+#raw{white-space:pre-wrap;background:#f5f6f7;padding:10px;border-radius:8px;min-height:50px}
+@media(max-width:500px){.buttons{grid-template-columns:1fr}}
 </style>
 </head>
 
 <body>
 
 <header>
-  📦 NB Express<br>
-  <span style="font-size:14px;font-weight:normal">
-    Leitor de Endereços iMile
-  </span>
+📦 NB Express<br>
+<span style="font-size:14px;font-weight:normal">Leitor inteligente de etiquetas iMile</span>
 </header>
 
 <main>
 
 <div class="card">
-  <h2>📷 1. Ler etiqueta</h2>
+<h2>📷 Ler etiqueta</h2>
 
-  <p class="small">
-    Aponte a câmera para o bloco do endereço.
-    Não precisa enquadrar o QR Code nem os códigos de barras.
-  </p>
+<p class="small">
+Aponte a câmera para a área do endereço. 
+O QR Code e os códigos de barras serão ignorados.
+</p>
 
-  <div class="camera">
-    <video id="video" autoplay playsinline></video>
+<div class="camera">
+<video id="video" autoplay playsinline></video>
+<div class="guide">
+<span>ENQUADRE O ENDEREÇO</span>
+</div>
+</div>
 
-    <div class="overlay">
-      <span>ENQUADRE O ENDEREÇO AQUI</span>
-    </div>
-  </div>
+<div class="buttons">
+<button class="primary" id="cameraBtn">📷 Abrir câmera</button>
+<button class="green" id="readBtn" disabled>🔎 Ler etiqueta</button>
+</div>
 
-  <div class="buttons">
-    <button class="primary" id="startCamera">
-      📷 Abrir câmera
-    </button>
+<div id="status" class="status">Câmera desligada.</div>
 
-    <button class="green" id="capture" disabled>
-      🔎 Ler etiqueta
-    </button>
-  </div>
-
-  <div class="status" id="status">
-    Câmera desligada.
-  </div>
-
-  <div class="loading" id="loading">
-    ⏳ Lendo etiqueta...<br>
-    Aguarde alguns segundos.
-  </div>
+<div id="loading" class="loading">
+⏳ Analisando a etiqueta...<br>
+Não saia da página.
+</div>
 </div>
 
 
 <div class="card">
-  <h2>📁 Alternativa: escolher uma imagem</h2>
-
-  <p class="small">
-    Se preferir, também pode selecionar uma foto da etiqueta.
-  </p>
-
-  <input
-    type="file"
-    id="fileInput"
-    accept="image/*"
-    capture="environment"
-  >
-
-  <img id="preview">
+<h2>📁 Usar uma foto</h2>
+<input type="file" id="file" accept="image/*" capture="environment">
 </div>
 
 
 <div class="card" id="resultCard" style="display:none">
 
-  <h2>✅ Dados encontrados</h2>
+<h2>✅ Resultado</h2>
 
-  <p class="small">
-    Confira os dados antes de adicionar à lista.
-  </p>
+<p class="small">
+Confira os dados. Você pode corrigir antes de adicionar.
+</p>
 
-  <div class="result">
+<div class="field">
+<label>🏠 Endereço</label>
+<input type="text" id="address">
+</div>
 
-    <div>
-      <label>Endereço</label>
-      <input type="text" id="address">
-    </div>
+<div class="field">
+<label>🔢 Número</label>
+<input type="text" id="number">
+</div>
 
-    <div>
-      <label>Número</label>
-      <input type="text" id="number">
-    </div>
+<div class="field">
+<label>🏙️ Cidade</label>
+<input type="text" id="city">
+</div>
 
-    <div>
-      <label>Cidade</label>
-      <input type="text" id="city">
-    </div>
+<div class="field">
+<label>📮 CEP</label>
+<input type="text" id="cep">
+</div>
 
-    <div>
-      <label>CEP</label>
-      <input type="text" id="cep">
-    </div>
-
-  </div>
-
-  <div class="buttons">
-    <button class="green" id="addRow">
-      ➕ Adicionar à lista
-    </button>
-
-    <button class="gray" id="readAgain">
-      🔄 Ler novamente
-    </button>
-  </div>
+<div class="buttons">
+<button class="green" id="add">➕ Adicionar à lista</button>
+<button class="gray" id="again">🔄 Ler novamente</button>
+</div>
 
 </div>
 
 
 <div class="card">
+<h2>📊 Endereços lidos</h2>
 
-  <h2>📊 Endereços</h2>
+<div class="wrap">
+<table>
+<thead>
+<tr>
+<th>Endereço</th>
+<th>Número</th>
+<th>Cidade</th>
+<th>CEP</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
 
-  <div class="table-wrap">
-
-    <table>
-      <thead>
-        <tr>
-          <th>Endereço</th>
-          <th>Número</th>
-          <th>Cidade</th>
-          <th>CEP</th>
-        </tr>
-      </thead>
-
-      <tbody id="tableBody"></tbody>
-
-    </table>
-
-  </div>
-
-  <div class="buttons">
-
-    <button class="green" id="exportExcel">
-      📥 Exportar Excel
-    </button>
-
-    <button class="red" id="clearAll">
-      🗑️ Limpar lista
-    </button>
-
-  </div>
-
+<div class="buttons">
+<button class="green" id="excel">📥 Exportar Excel</button>
+<button class="red" id="clear">🗑️ Limpar</button>
+</div>
 </div>
 
 
 <div class="card">
-  <h2>🔍 Texto reconhecido</h2>
-
-  <div
-    id="rawText"
-    class="small"
-    style="
-      white-space:pre-wrap;
-      background:#f5f6f7;
-      padding:10px;
-      border-radius:8px;
-      min-height:50px;
-    "
-  >
-    O texto reconhecido aparecerá aqui.
-  </div>
+<h2>🔍 Texto reconhecido</h2>
+<div id="raw">Nenhum texto ainda.</div>
 </div>
 
 </main>
 
 
-<!-- OCR -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-<!-- Excel -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-
 
 <script>
 
-let stream = null;
-let worker = null;
-let rows = [];
-
-const video = document.getElementById("video");
-const startCamera = document.getElementById("startCamera");
-const capture = document.getElementById("capture");
-const status = document.getElementById("status");
-const loading = document.getElementById("loading");
-const resultCard = document.getElementById("resultCard");
-const preview = document.getElementById("preview");
-const rawText = document.getElementById("rawText");
-
-const addressInput = document.getElementById("address");
-const numberInput = document.getElementById("number");
-const cityInput = document.getElementById("city");
-const cepInput = document.getElementById("cep");
-
-const tableBody = document.getElementById("tableBody");
-
-
-/* ============================
-   INICIAR CÂMERA
-============================ */
-
-startCamera.onclick = async () => {
-
-  try {
-
-    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      alert("Seu navegador não permite acesso à câmera.");
-      return;
-    }
-
-    stream = await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode:{ideal:"environment"},
-        width:{ideal:1920},
-        height:{ideal:1080}
-      },
-      audio:false
-    });
-
-    video.srcObject = stream;
-
-    capture.disabled = false;
-
-    status.textContent =
-      "📷 Câmera ligada. Enquadre somente o endereço dentro do retângulo.";
-
-  } catch(error){
-
-    console.error(error);
-
-    status.textContent =
-      "❌ Não foi possível abrir a câmera. Verifique a permissão do navegador.";
-
-  }
-
-};
-
-
-/* ============================
-   CAPTURAR CÂMERA
-============================ */
-
-capture.onclick = async () => {
-
-  if(!video.videoWidth){
-    alert("Aguarde a câmera iniciar.");
-    return;
-  }
-
-  const canvas = document.createElement("canvas");
-
-  const vw = video.videoWidth;
-  const vh = video.videoHeight;
-
-  /*
-    Mesma área aproximada do retângulo
-    mostrado na tela.
-  */
-
-  const sx = Math.floor(vw * 0.08);
-  const sy = Math.floor(vh * 0.27);
-  const sw = Math.floor(vw * 0.76);
-  const sh = Math.floor(vh * 0.46);
-
-  canvas.width = sw * 2;
-  canvas.height = sh * 2;
-
-  const ctx = canvas.getContext("2d");
-
-  ctx.drawImage(
-    video,
-    sx, sy, sw, sh,
-    0, 0, canvas.width, canvas.height
-  );
-
-  await processImage(canvas);
-
-};
-
-
-/* ============================
-   ESCOLHER IMAGEM
-============================ */
-
-document.getElementById("fileInput").onchange = async event => {
-
-  const file = event.target.files[0];
-
-  if(!file) return;
-
-  const img = new Image();
-
-  img.onload = async () => {
-
-    preview.src = img.src;
-    preview.style.display = "block";
-
-    const canvas = document.createElement("canvas");
-
-    const maxWidth = 1800;
-
-    let w = img.width;
-    let h = img.height;
-
-    if(w > maxWidth){
-
-      h = Math.round(h * maxWidth / w);
-      w = maxWidth;
-
-    }
-
-    canvas.width = w;
-    canvas.height = h;
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.drawImage(img,0,0,w,h);
-
-    await processImage(canvas);
-
-  };
-
-  img.src = URL.createObjectURL(file);
-
-};
-
-
-/* ============================
-   PRÉ-PROCESSAMENTO
-============================ */
-
-function preprocess(source){
-
-  const canvas = document.createElement("canvas");
-
-  canvas.width = source.width * 1.5;
-  canvas.height = source.height * 1.5;
-
-  const ctx = canvas.getContext("2d");
-
-  ctx.drawImage(
-    source,
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  const imageData =
-    ctx.getImageData(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-  const data = imageData.data;
-
-  for(let i=0;i<data.length;i+=4){
-
-    const r = data[i];
-    const g = data[i+1];
-    const b = data[i+2];
-
-    /*
-      Escala de cinza com contraste.
-    */
-
-    let gray =
-      0.299*r +
-      0.587*g +
-      0.114*b;
-
-    gray = (gray - 128) * 1.35 + 128;
-
-    gray = Math.max(0,Math.min(255,gray));
-
-    data[i] = gray;
-    data[i+1] = gray;
-    data[i+2] = gray;
-
-  }
-
-  ctx.putImageData(imageData,0,0);
-
-  return canvas;
+let stream=null;
+let worker=null;
+let lista=JSON.parse(localStorage.getItem("nbexpress_lista")||"[]");
+
+const video=document.getElementById("video");
+const cameraBtn=document.getElementById("cameraBtn");
+const readBtn=document.getElementById("readBtn");
+const status=document.getElementById("status");
+const loading=document.getElementById("loading");
+const resultCard=document.getElementById("resultCard");
+const raw=document.getElementById("raw");
+
+const address=document.getElementById("address");
+const number=document.getElementById("number");
+const city=document.getElementById("city");
+const cep=document.getElementById("cep");
+
+function msg(t){
+status.textContent=t;
 }
 
+function render(){
 
-/* ============================
-   OCR
-============================ */
+const tbody=document.getElementById("tbody");
+tbody.innerHTML="";
+
+lista.forEach(x=>{
+
+const tr=document.createElement("tr");
+
+[x.address,x.number,x.city,x.cep].forEach(v=>{
+const td=document.createElement("td");
+td.textContent=v||"";
+tr.appendChild(td);
+});
+
+tbody.appendChild(tr);
+
+});
+
+localStorage.setItem("nbexpress_lista",JSON.stringify(lista));
+}
+
+render();
+
+
+/* CÂMERA */
+
+cameraBtn.onclick=async()=>{
+
+try{
+
+stream=await navigator.mediaDevices.getUserMedia({
+video:{
+facingMode:{ideal:"environment"},
+width:{ideal:1920},
+height:{ideal:1080}
+},
+audio:false
+});
+
+video.srcObject=stream;
+readBtn.disabled=false;
+
+msg("📷 Câmera ligada. Enquadre o bloco do endereço.");
+
+}catch(e){
+
+msg("❌ Não consegui abrir a câmera. Autorize o acesso à câmera.");
+
+}
+
+};
+
+
+/* CAPTURAR */
+
+readBtn.onclick=async()=>{
+
+if(!video.videoWidth)return;
+
+const canvas=document.createElement("canvas");
+
+const w=video.videoWidth;
+const h=video.videoHeight;
+
+/*
+ Área esquerda/central da etiqueta.
+ Evita boa parte do QR Code.
+*/
+
+const sx=Math.round(w*.04);
+const sy=Math.round(h*.20);
+const sw=Math.round(w*.72);
+const sh=Math.round(h*.58);
+
+canvas.width=sw*2;
+canvas.height=sh*2;
+
+const ctx=canvas.getContext("2d");
+
+ctx.drawImage(
+video,
+sx,sy,sw,sh,
+0,0,canvas.width,canvas.height
+);
+
+await analisar(canvas);
+
+};
+
+
+/* FOTO */
+
+document.getElementById("file").onchange=e=>{
+
+const file=e.target.files[0];
+if(!file)return;
+
+const img=new Image();
+
+img.onload=async()=>{
+
+const canvas=document.createElement("canvas");
+
+let w=img.width;
+let h=img.height;
+
+const max=1800;
+
+if(w>max){
+h=Math.round(h*max/w);
+w=max;
+}
+
+canvas.width=w;
+canvas.height=h;
+
+canvas.getContext("2d").drawImage(img,0,0,w,h);
+
+await analisar(canvas);
+
+};
+
+img.src=URL.createObjectURL(file);
+
+};
+
+
+/* WORKER OCR */
 
 async function getWorker(){
 
-  if(worker) return worker;
+if(worker)return worker;
 
-  status.textContent =
-    "⏳ Preparando leitor de português...";
+msg("⏳ Preparando leitor em português...");
 
-  worker = await Tesseract.createWorker("por",1,{
-    logger:m => {
+worker=await Tesseract.createWorker("por",1,{
+logger:m=>{
 
-      if(m.status){
+if(m.status){
 
-        const percent =
-          m.progress
-          ? Math.round(m.progress * 100)
-          : "";
+let p=m.progress?
+Math.round(m.progress*100):"";
 
-        status.textContent =
-          "🔎 " + m.status +
-          (percent ? " " + percent + "%" : "");
+msg("🔎 "+m.status+(p?" "+p+"%":""));
 
-      }
-
-    }
-  });
-
-  return worker;
 }
 
-
-/* ============================
-   PROCESSAR IMAGEM
-============================ */
-
-async function processImage(canvas){
-
-  loading.style.display = "block";
-  resultCard.style.display = "none";
-
-  try{
-
-    const processed = preprocess(canvas);
-
-    const w = await getWorker();
-
-    status.textContent =
-      "🔎 Lendo somente o texto da etiqueta...";
-
-    const result =
-      await w.recognize(processed);
-
-    const text =
-      result.data.text || "";
-
-    rawText.textContent =
-      text || "Nenhum texto reconhecido.";
-
-    const data =
-      extractAddress(text);
-
-    addressInput.value =
-      data.address || "";
-
-    numberInput.value =
-      data.number || "";
-
-    cityInput.value =
-      data.city || "";
-
-    cepInput.value =
-      data.cep || "";
-
-    resultCard.style.display = "block";
-
-    if(data.address || data.city){
-
-      status.textContent =
-        "✅ Leitura concluída. Confira os campos abaixo.";
-
-    }else{
-
-      status.textContent =
-        "⚠️ Não consegui identificar o endereço com segurança. Tente aproximar a câmera e ler novamente.";
-
-    }
-
-  }catch(error){
-
-    console.error(error);
-
-    status.textContent =
-      "❌ Erro ao ler a etiqueta.";
-
-  }
-
-  loading.style.display = "none";
 }
+});
 
-
-/* ============================
-   LIMPEZA DO TEXTO
-============================ */
-
-function cleanText(text){
-
-  return text
-    .replace(/\r/g,"")
-    .replace(/[|]/g,"I")
-    .replace(/\bSUI\b/gi,"SUL")
-    .replace(/\bSui\b/g,"Sul")
-    .replace(/\s+/g," ")
-    .trim();
+return worker;
 
 }
 
 
-/* ============================
-   EXTRAIR ENDEREÇO
-============================ */
+/* MELHORAR IMAGEM */
 
-function extractAddress(text){
+function melhorar(source,modo){
 
-  const original = text || "";
+const c=document.createElement("canvas");
 
-  const lines =
-    original
-      .split("\n")
-      .map(x => cleanText(x))
-      .filter(x => x.length > 1);
+c.width=source.width*1.4;
+c.height=source.height*1.4;
 
+const ctx=c.getContext("2d");
 
-  let address = "";
-  let number = "";
-  let city = "";
-  let cep = "";
+ctx.drawImage(source,0,0,c.width,c.height);
 
+const im=ctx.getImageData(0,0,c.width,c.height);
+const d=im.data;
 
-  /* CEP */
+for(let i=0;i<d.length;i+=4){
 
-  const cepMatch =
-    original.match(/\b\d{5}[-.\s]?\d{3}\b/);
+let r=d[i];
+let g=d[i+1];
+let b=d[i+2];
 
-  if(cepMatch){
+let gray=.299*r+.587*g+.114*b;
 
-    cep =
-      cepMatch[0]
-        .replace(/\s/g,"-");
+if(modo===1){
 
-    if(!cep.includes("-")){
+gray=(gray-128)*1.5+128;
 
-      cep =
-        cep.slice(0,5) +
-        "-" +
-        cep.slice(5);
+}
 
-    }
+if(modo===2){
 
-  }
+gray=gray>145?255:0;
 
+}
 
-  /* TIPOS DE LOGRADOURO */
+gray=Math.max(0,Math.min(255,gray));
 
-  const streetRegex =
-    /\b(RUA|R\.|AVENIDA|AV\.|ALAMEDA|AL\.|TRAVESSA|TV\.|ESTRADA|RODOVIA|ROD\.|PRAÇA|PRACA|LARGO|BECO|SERVIDÃO|SERVIDAO)\b/i;
+d[i]=gray;
+d[i+1]=gray;
+d[i+2]=gray;
 
+}
 
-  for(let line of lines){
+ctx.putImageData(im,0,0);
 
-    if(streetRegex.test(line)){
-
-      let candidate =
-        line
-          .replace(
-            /^(ENDEREÇO|ENDERECO|TO|DESTINATÁRIO|DESTINATARIO)\s*[:\-]?\s*/i,
-            ""
-          )
-          .trim();
-
-      /*
-        Retira informações que possam vir
-        antes do logradouro.
-      */
-
-      const pos =
-        candidate.search(streetRegex);
-
-      if(pos > 0){
-
-        candidate =
-          candidate.slice(pos);
-
-      }
-
-      /*
-        Evita pegar linhas que são claramente
-        códigos.
-      */
-
-      if(
-        !/\d{8,}/.test(candidate) &&
-        candidate.length < 120
-      ){
-
-        address = candidate;
-
-        break;
-
-      }
-
-    }
-
-  }
-
-
-  /* Se não encontrou Rua/Av., procura linha com número */
-
-  if(!address){
-
-    for(let line of lines){
-
-      if(
-        /\d{1,5}/.test(line) &&
-        line.length >= 8 &&
-        line.length <= 100 &&
-        !/\d{8,}/.test(line)
-      ){
-
-        if(
-          !/CEP|CNPJ|CPF|PEDIDO|ORDER|TRACK|ROUTE|PICK|TIKTOK/i.test(line)
-        ){
-
-          address = line;
-          break;
-
-        }
-
-      }
-
-    }
-
-  }
-
-
-  /* NÚMERO */
-
-  if(address){
-
-    /*
-      Primeiro tenta número no final.
-      Exemplos:
-      Rua Silvio Sanson 225
-      Avenida Industrial 631
-      Rua Ildefonso Pinto 7D
-    */
-
-    let m =
-      address.match(
-        /(?:\s|,)(\d{1,6}[A-Za-z]?)\s*(?:$|,)/i
-      );
-
-    if(!m){
-
-      m =
-        address.match(
-          /\s(\d{1,6}[A-Za-z]?)\s*$/i
-        );
-
-    }
-
-    if(m){
-
-      number =
-        m[1].trim();
-
-    }
-
-    /*
-      Remove o número do campo endereço.
-    */
-
-    if(number){
-
-      address =
-        address
-          .replace(
-            new RegExp(
-              "\\s+" +
-              number.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") +
-              "\\s*$",
-              "i"
-            ),
-            ""
-          )
-          .trim();
-
-    }
-
-  }
-
-
-  /* CIDADE */
-
-  const normalized =
-    original.replace(/\r/g,"");
-
-
-  /*
-    Procura cidade antes de RS.
-  */
-
-  let cityMatch =
-    normalized.match(
-      /([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){1,6})\s*,?\s*(?:RS|R\.S\.|RIO GRANDE DO SUL)\b/i
-    );
-
-  if(cityMatch){
-
-    city =
-      cleanCity(cityMatch[1]);
-
-  }
-
-
-  /*
-    Tratamento especial para uma cidade
-    muito comum nas etiquetas mostradas.
-  */
-
-  if(!city){
-
-    if(/SAPUCAIA\s+DO\s+SUL/i.test(original)){
-
-      city = "Sapucaia do Sul";
-
-    }
-
-  }
-
-
-  /*
-    Procura linhas contendo cidade conhecida
-    mesmo que o OCR tenha alterado o "l".
-  */
-
-  if(!city){
-
-    for(let line of lines){
-
-      if(/SAPUCAIA\s+DO\s+S(U|I)(L|I)/i.test(line)){
-
-        city = "Sapucaia do Sul";
-        break;
-
-      }
-
-    }
-
-  }
-
-
-  return {
-    address,
-    number,
-    city,
-    cep
-  };
+return c;
 
 }
 
 
-/* ============================
-   NORMALIZAR CIDADE
-============================ */
+/* OCR */
 
-function cleanCity(city){
+async function ocr(img){
 
-  city =
-    city
-      .replace(/[,;:.]+$/g,"")
-      .trim();
+const w=await getWorker();
 
-  if(
-    /SAPUCAIA\s+DO\s+SUL/i.test(city) ||
-    /SAPUCAIA\s+DO\s+SUI/i.test(city)
-  ){
+const r=await w.recognize(img);
 
-    return "Sapucaia do Sul";
-
-  }
-
-  return city
-    .toLowerCase()
-    .split(" ")
-    .map(word =>
-      word.charAt(0).toUpperCase() +
-      word.slice(1)
-    )
-    .join(" ");
+return r.data.text||"";
 
 }
 
 
-/* ============================
-   ADICIONAR À LISTA
-============================ */
+/* ANALISAR */
 
-document.getElementById("addRow").onclick = () => {
+async function analisar(canvas){
 
-  const address =
-    addressInput.value.trim();
+loading.style.display="block";
+resultCard.style.display="none";
 
-  const number =
-    numberInput.value.trim();
+try{
 
-  const city =
-    cityInput.value.trim();
+msg("🔎 Procurando endereço...");
 
-  const cep =
-    cepInput.value.trim();
+/*
+ Faz três versões da mesma imagem.
+*/
 
-  if(!address && !city){
+const img1=melhorar(canvas,0);
+const img2=melhorar(canvas,1);
+const img3=melhorar(canvas,2);
 
-    alert("Confira os dados antes de adicionar.");
+const textos=[];
 
-    return;
+for(const img of [img1,img2,img3]){
 
-  }
+try{
 
-  rows.push({
-    Endereço:address,
-    Número:number,
-    Cidade:city,
-    CEP:cep
-  });
+const t=await ocr(img);
 
-  saveRows();
+if(t)textos.push(t);
 
-  renderTable();
+}catch(e){}
 
-  resultCard.style.display = "none";
+}
 
-  status.textContent =
-    "✅ Endereço adicionado à lista.";
+const texto=textos.join("\n");
+
+raw.textContent=texto||"Nenhum texto reconhecido.";
+
+const dados=extrair(texto);
+
+address.value=dados.address;
+number.value=dados.number;
+city.value=dados.city;
+cep.value=dados.cep;
+
+resultCard.style.display="block";
+
+if(dados.address||dados.city){
+
+msg("✅ Encontrei possíveis dados. Confira antes de adicionar.");
+
+}else{
+
+msg("⚠️ Não consegui identificar com segurança. Tente aproximar a etiqueta.");
+
+}
+
+}catch(e){
+
+console.error(e);
+msg("❌ Erro durante a leitura.");
+
+}
+
+loading.style.display="none";
+
+}
+
+
+/* EXTRAÇÃO */
+
+function extrair(texto){
+
+let linhas=texto
+.split("\n")
+.map(x=>x.trim())
+.filter(x=>x.length>1);
+
+let resultado={
+address:"",
+number:"",
+city:"",
+cep:""
+};
+
+
+/* CEP */
+
+const ceps=texto.match(/\b\d{5}[-.\s]?\d{3}\b/g);
+
+if(ceps&&ceps.length){
+
+resultado.cep=ceps[0]
+.replace(/[.\s]/g,"-");
+
+if(!resultado.cep.includes("-")){
+resultado.cep=
+resultado.cep.slice(0,5)+"-"+resultado.cep.slice(5);
+}
+
+}
+
+
+/* ENDEREÇO */
+
+const tipos=
+/\b(RUA|R\.|AVENIDA|AV\.|ALAMEDA|TRAVESSA|TV\.|ESTRADA|RODOVIA|ROD\.|PRAÇA|PRACA|LARGO|BECO)\b/i;
+
+let candidatos=[];
+
+linhas.forEach(l=>{
+
+if(tipos.test(l)){
+
+if(
+!/\b(TIKTOK|SHOP|PICK|PESO|ROTA|ROUTE|TRACK|ORDER|CNPJ|CPF)\b/i.test(l)&&
+!/\d{8,}/.test(l)
+){
+
+candidatos.push(l);
+
+}
+
+}
+
+});
+
+
+if(candidatos.length){
+
+let melhor=candidatos[0];
+
+/*
+ Escolhe a linha mais provável.
+*/
+
+for(const c of candidatos){
+
+if(/\d{1,6}/.test(c)){
+melhor=c;
+break;
+}
+
+}
+
+resultado.address=melhor;
+
+}
+
+
+/* CORRIGIR ERROS COMUNS */
+
+resultado.address=resultado.address
+.replace(/\bR ua\b/gi,"Rua")
+.replace(/\bAv enida\b/gi,"Avenida")
+.replace(/\bSui\b/gi,"Sul")
+.replace(/\bSUI\b/g,"Sul")
+.trim();
+
+
+/* NÚMERO */
+
+if(resultado.address){
+
+let m=resultado.address.match(
+/(?:^|\s)(\d{1,6}[A-Za-z]?)(?:\s*$|[,;])/);
+
+if(!m){
+
+m=resultado.address.match(
+/\s(\d{1,6}[A-Za-z]?)\s*$/);
+
+}
+
+if(m){
+
+resultado.number=m[1];
+
+resultado.address=
+resultado.address
+.replace(
+new RegExp("\\s+"+escapeReg(resultado.number)+"\\s*$"),
+""
+)
+.trim();
+
+}
+
+}
+
+
+/* CIDADE */
+
+/*
+ Primeiro procura cidades que aparecem
+ junto de RS.
+*/
+
+let cidadeMatch=texto.match(
+/([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){1,5})\s*,?\s*(?:RS|R\.S\.|RIO GRANDE DO SUL)\b/i
+);
+
+if(cidadeMatch){
+
+resultado.city=normalizarCidade(cidadeMatch[1]);
+
+}
+
+
+/*
+ Tratamento especial para cidades comuns
+ nas suas etiquetas.
+*/
+
+if(!resultado.city){
+
+if(/SAPUCAIA\s+DO\s+S[UUI][LI]/i.test(texto))
+resultado.city="Sapucaia do Sul";
+
+}
+
+if(!resultado.city){
+
+if(/ESTEIO/i.test(texto))
+resultado.city="Esteio";
+
+}
+
+if(!resultado.city){
+
+if(/SÃO\s+LEOPOLDO|SAO\s+LEOPOLDO/i.test(texto))
+resultado.city="São Leopoldo";
+
+}
+
+
+/*
+ Se ainda não achou cidade,
+ procura uma linha que pareça cidade.
+*/
+
+if(!resultado.city){
+
+for(const l of linhas){
+
+if(
+/^(SAPUCAIA|ESTEIO|CANOAS|PORTO ALEGRE|SÃO LEOPOLDO|SAO LEOPOLDO)/i.test(l)
+){
+
+resultado.city=normalizarCidade(l);
+break;
+
+}
+
+}
+
+}
+
+return resultado;
+
+}
+
+
+function normalizarCidade(s){
+
+s=s.replace(/[,;:.]+$/,"").trim();
+
+if(/SAPUCAIA\s+DO\s+SUI/i.test(s)||
+/SAPUCAIA\s+DO\s+SUL/i.test(s))
+return "Sapucaia do Sul";
+
+if(/ESTEIO/i.test(s))
+return "Esteio";
+
+if(/S[ÃA]O\s+LEOPOLDO/i.test(s))
+return "São Leopoldo";
+
+return s
+.toLowerCase()
+.split(" ")
+.map(x=>x.charAt(0).toUpperCase()+x.slice(1))
+.join(" ");
+
+}
+
+
+function escapeReg(s){
+return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+}
+
+
+/* ADICIONAR */
+
+document.getElementById("add").onclick=()=>{
+
+const a=address.value.trim();
+const n=number.value.trim();
+const c=city.value.trim();
+const p=cep.value.trim();
+
+if(!a&&!c){
+
+alert("Confira os dados antes de adicionar.");
+return;
+
+}
+
+lista.push({
+address:a,
+number:n,
+city:c,
+cep:p
+});
+
+render();
+
+resultCard.style.display="none";
+
+msg("✅ Endereço adicionado à lista.");
 
 };
 
 
-/* ============================
-   TABELA
-============================ */
+/* NOVA LEITURA */
 
-function renderTable(){
+document.getElementById("again").onclick=()=>{
 
-  tableBody.innerHTML = "";
+resultCard.style.display="none";
 
-  rows.forEach(row => {
-
-    const tr =
-      document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${escapeHtml(row.Endereço)}</td>
-      <td>${escapeHtml(row.Número)}</td>
-      <td>${escapeHtml(row.Cidade)}</td>
-      <td>${escapeHtml(row.CEP)}</td>
-    `;
-
-    tableBody.appendChild(tr);
-
-  });
-
-}
-
-
-function escapeHtml(value){
-
-  return String(value || "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;");
-
-}
-
-
-/* ============================
-   SALVAR NO CELULAR
-============================ */
-
-function saveRows(){
-
-  localStorage.setItem(
-    "nbexpress_enderecos",
-    JSON.stringify(rows)
-  );
-
-}
-
-
-function loadRows(){
-
-  try{
-
-    const saved =
-      localStorage.getItem(
-        "nbexpress_enderecos"
-      );
-
-    if(saved){
-
-      rows =
-        JSON.parse(saved);
-
-    }
-
-  }catch(e){
-
-    rows = [];
-
-  }
-
-  renderTable();
-
-}
-
-loadRows();
-
-
-/* ============================
-   LER NOVAMENTE
-============================ */
-
-document.getElementById("readAgain").onclick = () => {
-
-  resultCard.style.display = "none";
-
-  status.textContent =
-    "📷 Pronto para uma nova leitura.";
+msg("📷 Pronto para uma nova leitura.");
 
 };
 
 
-/* ============================
-   EXPORTAR EXCEL
-============================ */
+/* EXCEL */
 
-document.getElementById("exportExcel").onclick = () => {
+document.getElementById("excel").onclick=()=>{
 
-  if(rows.length === 0){
+if(!lista.length){
 
-    alert("Ainda não há endereços na lista.");
+alert("A lista está vazia.");
+return;
 
-    return;
+}
 
-  }
+const dados=lista.map(x=>({
+"Endereço":x.address,
+"Número":x.number,
+"Cidade":x.city,
+"CEP":x.cep
+}));
 
-  const worksheet =
-    XLSX.utils.json_to_sheet(rows);
+const ws=XLSX.utils.json_to_sheet(dados);
+const wb=XLSX.utils.book_new();
 
-  const workbook =
-    XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(
+wb,
+ws,
+"Endereços"
+);
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Endereços"
-  );
+const agora=new Date();
 
-  const agora =
-    new Date();
+const nome=
+"NB_Express_"+
+agora.getFullYear()+"-"+
+String(agora.getMonth()+1).padStart(2,"0")+"-"+
+String(agora.getDate()).padStart(2,"0")+
+".xlsx";
 
-  const nome =
-    "NB_Express_" +
-    agora.getFullYear() +
-    "-" +
-    String(agora.getMonth()+1).padStart(2,"0") +
-    "-" +
-    String(agora.getDate()).padStart(2,"0") +
-    ".xlsx";
-
-  XLSX.writeFile(
-    workbook,
-    nome
-  );
+XLSX.writeFile(wb,nome);
 
 };
 
 
-/* ============================
-   LIMPAR
-============================ */
+/* LIMPAR */
 
-document.getElementById("clearAll").onclick = () => {
+document.getElementById("clear").onclick=()=>{
 
-  if(rows.length === 0) return;
+if(!lista.length)return;
 
-  if(
-    confirm(
-      "Tem certeza que deseja apagar todos os endereços?"
-    )
-  ){
+if(confirm("Apagar todos os endereços?")){
 
-    rows = [];
+lista=[];
 
-    saveRows();
+render();
 
-    renderTable();
-
-    status.textContent =
-      "🗑️ Lista limpa.";
-
-  }
+}
 
 };
 
